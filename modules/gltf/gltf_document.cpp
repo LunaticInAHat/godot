@@ -2940,7 +2940,7 @@ Error GLTFDocument::_serialize_images(Ref<GLTFState> state, const String &p_path
 
 		ERR_CONTINUE(state->images[i].is_null());
 
-		Ref<Image> image = state->images[i]->get_data();
+		Ref<Image> image = state->images[i];
 		ERR_CONTINUE(image.is_null());
 
 		if (p_path.to_lower().ends_with("glb")) {
@@ -3214,6 +3214,8 @@ Error GLTFDocument::_parse_textures(Ref<GLTFState> state) {
 			case MinFilter::NEAREST_MIPMAP_NEAREST:
 				flags |= Texture::Flags::FLAG_MIPMAPS;
 				break;
+			default:
+				break;
 		}
 
 		// Set texture filter
@@ -3222,6 +3224,8 @@ Error GLTFDocument::_parse_textures(Ref<GLTFState> state) {
 			case MinFilter::LINEAR_MIPMAP_NEAREST:
 			case MinFilter::LINEAR:
 				flags |= Texture::Flags::FLAG_FILTER;
+				break;
+			default:
 				break;
 		}
 		if ((MagFilter)sampler->get_mag_filter() == MagFilter::LINEAR) {
@@ -3260,8 +3264,8 @@ GLTFTextureIndex GLTFDocument::_set_texture(Ref<GLTFState> state, Ref<Texture> p
 	Ref<GLTFTextureSampler> gltf_sampler;
 	gltf_sampler.instance();
 
-	bool mipmaps = (p_texture->get_flags() & Texture::FLAG_MIPMAPS) > 0;
-	bool filter = (p_texture->get_flags() & Texture::FLAG_FILTER) > 0;
+	bool mipmaps = (p_texture->get_flags() & Texture::FLAG_MIPMAPS) != 0;
+	bool filter = (p_texture->get_flags() & Texture::FLAG_FILTER) != 0;
 
 	// Interpret the texture flags as sampler properties
 	if (filter) {
@@ -3280,10 +3284,10 @@ GLTFTextureIndex GLTFDocument::_set_texture(Ref<GLTFState> state, Ref<Texture> p
 		gltf_sampler->set_mag_filter((int)GLTFTextureSampler::MagFilter::NEAREST);
 	}
 
-	if (p_texture->get_flags() & Texture::FLAG_MIRRORED_REPEAT > 0) {
+	if ((p_texture->get_flags() & Texture::FLAG_MIRRORED_REPEAT) != 0) {
 		gltf_sampler->set_wrap_s((int)GLTFTextureSampler::WrapMode::MIRRORED_REPEAT);
 		gltf_sampler->set_wrap_t((int)GLTFTextureSampler::WrapMode::MIRRORED_REPEAT);
-	} else if (p_texture->get_flags() & Texture::FLAG_REPEAT > 0) {
+	} else if ((p_texture->get_flags() & Texture::FLAG_REPEAT) != 0) {
 		gltf_sampler->set_wrap_s((int)GLTFTextureSampler::WrapMode::REPEAT);
 		gltf_sampler->set_wrap_t((int)GLTFTextureSampler::WrapMode::REPEAT);
 	} else {
