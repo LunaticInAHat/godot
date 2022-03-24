@@ -39,7 +39,8 @@ class GLTFTextureSampler : public Resource {
 public:
 	enum class MagFilter {
 		NEAREST = 9728,
-		LINEAR = 9729
+		LINEAR = 9729,
+		DEFAULT = LINEAR
 	};
 
 	enum class MinFilter {
@@ -48,7 +49,8 @@ public:
 		NEAREST_MIPMAP_NEAREST = 9984,
 		LINEAR_MIPMAP_NEAREST = 9985,
 		NEAREST_MIPMAP_LINEAR = 9986,
-		LINEAR_MIPMAP_LINEAR = 9987
+		LINEAR_MIPMAP_LINEAR = 9987,
+		DEFAULT = LINEAR_MIPMAP_LINEAR
 	};
 
 	enum class WrapMode {

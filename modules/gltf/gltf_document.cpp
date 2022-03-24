@@ -3338,15 +3338,20 @@ Error GLTFDocument::_parse_texture_samplers(Ref<GLTFState> state) {
 	for (int i = 0; i < samplers.size(); ++i) {
 		const Dictionary &d = samplers[i];
 
-		ERR_FAIL_COND_V(!d.has("minFilter"), ERR_PARSE_ERROR);
-		ERR_FAIL_COND_V(!d.has("magFilter"), ERR_PARSE_ERROR);
-
 		Ref<GLTFTextureSampler> sampler;
 		sampler.instance();
-		sampler->set_min_filter(d["minFilter"]);
-		sampler->set_mag_filter(d["magFilter"]);
 
-		// Wrapping modes are optional and have default values.
+		if (d.has("minFilter")) {
+			sampler->set_min_filter(d["minFilter"]);
+		} else {
+			sampler->set_min_filter((int)GLTFTextureSampler::MinFilter::DEFAULT);
+		}
+		if (d.has("magFilter")) {
+			sampler->set_mag_filter(d["magFilter"]);
+		} else {
+			sampler->set_mag_filter((int)GLTFTextureSampler::MagFilter::DEFAULT);
+		}
+
 		if (d.has("wrapS")) {
 			sampler->set_wrap_s(d["wrapS"]);
 		} else {
