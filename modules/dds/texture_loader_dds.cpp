@@ -458,11 +458,14 @@ Ref<Resource> ResourceFormatDDS::load(const String &p_path, const String &p_orig
 		// Generic uncompressed.
 		uint32_t size = width * height * info.block_size;
 
+		uint32_t last_mip_offset = 0u;
 		for (uint32_t i = 1; i < mipmaps; i++) {
 			w = (w + 1) >> 1;
 			h = (h + 1) >> 1;
+			last_mip_offset = size;
 			size += w * h * info.block_size;
 		}
+		const uint32_t src_size = size;
 
 		// Calculate the space these formats will take up after decoding.
 		if (dds_format == DDS_BGR565) {
@@ -473,8 +476,11 @@ Ref<Resource> ResourceFormatDDS::load(const String &p_path, const String &p_orig
 
 		src_data.resize(size);
 		uint8_t *wb = src_data.ptrw();
-		f->get_buffer(wb, size);
+		f->get_buffer(wb, src_size);
 
+		const uint32_t last_mip_w = w;
+		const uint32_t last_mip_h = h;
+		uint32_t pixel_size = 4u;
 		// Decode nonstandard formats.
 		switch (dds_format) {
 			case DDS_BGR5A1: {
@@ -499,6 +505,7 @@ Ref<Resource> ResourceFormatDDS::load(const String &p_path, const String &p_orig
 			} break;
 			case DDS_BGR565: {
 				// To RGB8.
+				pixel_size = 3u;
 				int colcount = size / 3;
 
 				for (int i = colcount - 1; i >= 0; i--) {
@@ -592,6 +599,7 @@ Ref<Resource> ResourceFormatDDS::load(const String &p_path, const String &p_orig
 			} break;
 			case DDS_BGR8: {
 				// To RGB8.
+				pixel_size = 3u;
 				int colcount = size / 3;
 
 				for (int i = 0; i < colcount; i++) {
@@ -601,6 +609,35 @@ Ref<Resource> ResourceFormatDDS::load(const String &p_path, const String &p_orig
 			} break;
 
 			default: {
+			}
+		}
+		if ((mipmaps >= 2u) && ((last_mip_w >= 2u) || (last_mip_h >= 2u))) {
+			// The source image's mipmap chain ends above the 1x1 base-case, however the renderer expects textures to have complete mipmap chains.
+			// Thus, we generate (very crude) mipmaps for the missing levels.
+			uint32_t mip_gen_offset = size;
+			while ((w >= 2u) || (h >= 2u)) {
+				w = MAX(1u, w >> 1);
+				h = MAX(1u, h >> 1);
+				size += w * h * pixel_size;
+			}
+			src_data.resize(size);
+			w = last_mip_w;
+			h = last_mip_h;
+			while ((w >= 2u) || (h >= 2u)) {
+				w = MAX(1u, w >> 1);
+				h = MAX(1u, h >> 1);
+
+				const uint32_t start_offset = mip_gen_offset;
+				uint32_t mip_read_offset = last_mip_offset;
+				for (uint32_t y = 0u; y < h; y++) {
+					for (uint32_t x = 0u; x < w; x++) {
+						memcpy(&wb[mip_gen_offset], &wb[mip_read_offset], pixel_size);
+						mip_gen_offset += pixel_size;
+						mip_read_offset += (2 * pixel_size);		// skip a pixel
+					}
+					mip_read_offset += (w * pixel_size);	// skip a scanline
+				}
+				last_mip_offset = start_offset;
 			}
 		}
 	}
