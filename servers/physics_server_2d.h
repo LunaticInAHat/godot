@@ -74,6 +74,9 @@ public:
 	virtual void apply_force(const Vector2 &p_force, const Vector2 &p_position = Vector2()) = 0;
 	virtual void apply_torque(real_t p_torque) = 0;
 
+	virtual Vector2 get_applied_force() const = 0;
+	virtual real_t get_applied_torque() const = 0;
+
 	virtual void add_constant_central_force(const Vector2 &p_force) = 0;
 	virtual void add_constant_force(const Vector2 &p_force, const Vector2 &p_position = Vector2()) = 0;
 	virtual void add_constant_torque(real_t p_torque) = 0;
@@ -446,6 +449,9 @@ public:
 	virtual void body_apply_central_force(RID p_body, const Vector2 &p_force) = 0;
 	virtual void body_apply_force(RID p_body, const Vector2 &p_force, const Vector2 &p_position = Vector2()) = 0;
 	virtual void body_apply_torque(RID p_body, real_t p_torque) = 0;
+
+	virtual Vector2 body_get_applied_force(RID p_body) const = 0;
+	virtual real_t body_get_applied_torque(RID p_body) const = 0;
 
 	virtual void body_add_constant_central_force(RID p_body, const Vector2 &p_force) = 0;
 	virtual void body_add_constant_force(RID p_body, const Vector2 &p_force, const Vector2 &p_position = Vector2()) = 0;
