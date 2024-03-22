@@ -122,6 +122,14 @@ void GodotPhysicsDirectBodyState2D::apply_torque(real_t p_torque) {
 	body->apply_torque(p_torque);
 }
 
+Vector2 GodotPhysicsDirectBodyState2D::get_applied_force() const {
+	return body->get_applied_force();
+}
+
+real_t GodotPhysicsDirectBodyState2D::get_applied_torque() const {
+	return body->get_applied_torque();
+}
+
 void GodotPhysicsDirectBodyState2D::add_constant_central_force(const Vector2 &p_force) {
 	body->wakeup();
 	body->add_constant_central_force(p_force);
