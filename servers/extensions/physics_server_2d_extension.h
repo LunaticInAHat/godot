@@ -75,6 +75,9 @@ public:
 	EXBIND2(apply_force, const Vector2 &, const Vector2 &)
 	EXBIND1(apply_torque, real_t)
 
+	EXBIND0RC(Vector2, get_applied_force)
+	EXBIND0RC(real_t, get_applied_torque)
+
 	EXBIND1(add_constant_central_force, const Vector2 &)
 	EXBIND2(add_constant_force, const Vector2 &, const Vector2 &)
 	EXBIND1(add_constant_torque, real_t)
@@ -339,6 +342,9 @@ public:
 	EXBIND2(body_apply_central_force, RID, const Vector2 &)
 	EXBIND3(body_apply_force, RID, const Vector2 &, const Vector2 &)
 	EXBIND2(body_apply_torque, RID, real_t)
+
+	EXBIND1RC(Vector2, body_get_applied_force, RID)
+	EXBIND1RC(real_t, body_get_applied_torque, RID)
 
 	EXBIND2(body_add_constant_central_force, RID, const Vector2 &)
 	EXBIND3(body_add_constant_force, RID, const Vector2 &, const Vector2 &)

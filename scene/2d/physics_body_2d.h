@@ -300,6 +300,9 @@ public:
 	void apply_force(const Vector2 &p_force, const Vector2 &p_position = Vector2());
 	void apply_torque(real_t p_torque);
 
+	Vector2 get_applied_force() const;
+	real_t get_applied_torque() const;
+
 	void add_constant_central_force(const Vector2 &p_force);
 	void add_constant_force(const Vector2 &p_force, const Vector2 &p_position = Vector2());
 	void add_constant_torque(real_t p_torque);

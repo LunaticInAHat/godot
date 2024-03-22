@@ -826,6 +826,14 @@ void RigidBody2D::apply_torque(real_t p_torque) {
 	PhysicsServer2D::get_singleton()->body_apply_torque(get_rid(), p_torque);
 }
 
+Vector2 RigidBody2D::get_applied_force() const {
+	return PhysicsServer2D::get_singleton()->body_get_applied_force(get_rid());
+}
+
+real_t RigidBody2D::get_applied_torque() const {
+	return PhysicsServer2D::get_singleton()->body_get_applied_torque(get_rid());
+}
+
 void RigidBody2D::add_constant_central_force(const Vector2 &p_force) {
 	PhysicsServer2D::get_singleton()->body_add_constant_central_force(get_rid(), p_force);
 }
@@ -998,6 +1006,9 @@ void RigidBody2D::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("apply_central_force", "force"), &RigidBody2D::apply_central_force);
 	ClassDB::bind_method(D_METHOD("apply_force", "force", "position"), &RigidBody2D::apply_force, Vector2());
 	ClassDB::bind_method(D_METHOD("apply_torque", "torque"), &RigidBody2D::apply_torque);
+
+	ClassDB::bind_method(D_METHOD("get_applied_force"), &RigidBody2D::get_applied_force);
+	ClassDB::bind_method(D_METHOD("get_applied_torque"), &RigidBody2D::get_applied_torque);
 
 	ClassDB::bind_method(D_METHOD("add_constant_central_force", "force"), &RigidBody2D::add_constant_central_force);
 	ClassDB::bind_method(D_METHOD("add_constant_force", "force", "position"), &RigidBody2D::add_constant_force, Vector2());

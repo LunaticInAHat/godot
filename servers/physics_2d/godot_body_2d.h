@@ -262,6 +262,9 @@ public:
 		applied_torque += p_torque;
 	}
 
+	Vector2 get_applied_force() const { return applied_force; }
+	real_t get_applied_torque() const { return applied_torque; }
+
 	_FORCE_INLINE_ void add_constant_central_force(const Vector2 &p_force) {
 		constant_force += p_force;
 	}
