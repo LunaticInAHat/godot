@@ -222,6 +222,9 @@ public:
 	virtual void body_apply_force(RID p_body, const Vector2 &p_force, const Vector2 &p_position = Vector2()) override;
 	virtual void body_apply_torque(RID p_body, real_t p_torque) override;
 
+	virtual Vector2 body_get_applied_force(RID p_body) const override;
+	virtual real_t body_get_applied_torque(RID p_body) const override;
+
 	virtual void body_add_constant_central_force(RID p_body, const Vector2 &p_force) override;
 	virtual void body_add_constant_force(RID p_body, const Vector2 &p_force, const Vector2 &p_position = Vector2()) override;
 	virtual void body_add_constant_torque(RID p_body, real_t p_torque) override;

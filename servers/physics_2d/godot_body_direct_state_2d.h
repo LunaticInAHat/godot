@@ -65,6 +65,9 @@ public:
 	virtual void apply_impulse(const Vector2 &p_impulse, const Vector2 &p_position = Vector2()) override;
 	virtual void apply_torque_impulse(real_t p_torque) override;
 
+	virtual Vector2 get_applied_force() const override;
+	virtual real_t get_applied_torque() const override;
+
 	virtual void apply_central_force(const Vector2 &p_force) override;
 	virtual void apply_force(const Vector2 &p_force, const Vector2 &p_position = Vector2()) override;
 	virtual void apply_torque(real_t p_torque) override;
