@@ -2303,17 +2303,26 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 				GET_INSTRUCTION_ARG(dst, argc);
 
 				const GDScript *gds = _script;
+				StringName base_class = StringName();
 
 				HashMap<StringName, GDScriptFunction *>::ConstIterator E;
 				while (gds->base.ptr()) {
 					gds = gds->base.ptr();
 					E = gds->member_functions.find(*methodname);
 					if (E) {
+						base_class = gds->get_class_name();
 						break;
 					}
 				}
 
 				Callable::CallError err;
+
+#ifdef DEBUG_ENABLED
+				uint64_t call_time = 0;
+				if (GDScriptLanguage::get_singleton()->profiling) {
+					call_time = OS::get_singleton()->get_ticks_usec();
+				}
+#endif
 
 				if (E) {
 					*dst = E->value->call(p_instance, (const Variant **)argptrs, argc, err);
@@ -2335,6 +2344,16 @@ Variant GDScriptFunction::call(GDScriptInstance *p_instance, const Variant **p_a
 						err.error = Callable::CallError::CALL_OK;
 					}
 				}
+
+#ifdef DEBUG_ENABLED
+				if (GDScriptLanguage::get_singleton()->profiling) {
+					uint64_t t_taken = OS::get_singleton()->get_ticks_usec() - call_time;
+					if (GDScriptLanguage::get_singleton()->profile_native_calls && gds->native.ptr()) {
+						_profile_native_call(t_taken, *methodname, base_class);
+					}
+					function_call_time += t_taken;
+				}
+#endif
 
 				if (err.error != Callable::CallError::CALL_OK) {
 					String methodstr = *methodname;
