@@ -54,6 +54,7 @@ void SceneShaderForwardMobile::ShaderData::set_code(const String &p_code) {
 	ShaderCompiler::GeneratedCode gen_code;
 
 	int blend_mode = BLEND_MODE_MIX;
+	Vector<StringName> blend_factors;
 	int depth_testi = DEPTH_TEST_ENABLED;
 	int alpha_antialiasing_mode = ALPHA_ANTIALIASING_OFF;
 	int cull = CULL_BACK;
@@ -139,6 +140,7 @@ void SceneShaderForwardMobile::ShaderData::set_code(const String &p_code) {
 	actions.write_flag_pointers["PROJECTION_MATRIX"] = &writes_modelview_or_projection;
 	actions.write_flag_pointers["VERTEX"] = &uses_vertex;
 
+	actions.blend_factors = &blend_factors;
 	actions.uniforms = &uniforms;
 
 	SceneShaderForwardMobile *shader_singleton = (SceneShaderForwardMobile *)SceneShaderForwardMobile::singleton;
@@ -267,6 +269,15 @@ void SceneShaderForwardMobile::ShaderData::set_code(const String &p_code) {
 			blend_attachment.dst_alpha_blend_factor = RD::BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
 			uses_blend_alpha = true; // Force alpha used because of blend.
 		} break;
+	}
+
+	if (blend_factors.size() == 4) {
+		// fully-specified blend mode inside shader overrides blending mode specified in render_mode
+		blend_attachment.enable_blend = true;
+		blend_attachment.src_color_blend_factor = RD::render_get_blend_factor_by_name(blend_factors[0]);
+		blend_attachment.dst_color_blend_factor = RD::render_get_blend_factor_by_name(blend_factors[1]);
+		blend_attachment.src_alpha_blend_factor = RD::render_get_blend_factor_by_name(blend_factors[2]);
+		blend_attachment.dst_alpha_blend_factor = RD::render_get_blend_factor_by_name(blend_factors[3]);
 	}
 
 	RD::PipelineColorBlendState blend_state_blend;
