@@ -346,7 +346,7 @@ void ResourceLoader::_thread_load_function(void *p_userdata) {
 	bool ignoring = load_task.cache_mode == ResourceFormatLoader::CACHE_MODE_IGNORE || load_task.cache_mode == ResourceFormatLoader::CACHE_MODE_IGNORE_DEEP;
 	bool replacing = load_task.cache_mode == ResourceFormatLoader::CACHE_MODE_REPLACE || load_task.cache_mode == ResourceFormatLoader::CACHE_MODE_REPLACE_DEEP;
 	bool unlock_pending = true;
-	if (load_task.resource.is_valid()) {
+	if (res.is_valid()) {
 		// From now on, no critical section needed as no one will write to the task anymore.
 		// Moreover, the mutex being unlocked is a requirement if some of the calls below
 		// that set the resource up invoke code that in turn requests resource loading.
@@ -356,37 +356,37 @@ void ResourceLoader::_thread_load_function(void *p_userdata) {
 		if (!ignoring) {
 			if (replacing) {
 				Ref<Resource> old_res = ResourceCache::get_ref(load_task.local_path);
-				if (old_res.is_valid() && old_res != load_task.resource) {
+				if (old_res.is_valid() && old_res != res) {
 					// If resource is already loaded, only replace its data, to avoid existing invalidating instances.
-					old_res->copy_from(load_task.resource);
-					load_task.resource = old_res;
+					old_res->copy_from(res);
+					res = old_res;
 				}
 			}
-			load_task.resource->set_path(load_task.local_path, replacing);
+			res->set_path(load_task.local_path, replacing);
 		} else {
-			load_task.resource->set_path_cache(load_task.local_path);
+			res->set_path_cache(load_task.local_path);
 		}
 
 		if (load_task.xl_remapped) {
-			load_task.resource->set_as_translation_remapped(true);
+			res->set_as_translation_remapped(true);
 		}
 
 #ifdef TOOLS_ENABLED
-		load_task.resource->set_edited(false);
+		res->set_edited(false);
 		if (timestamp_on_load) {
 			uint64_t mt = FileAccess::get_modified_time(load_task.remapped_path);
 			//printf("mt %s: %lli\n",remapped_path.utf8().get_data(),mt);
-			load_task.resource->set_last_modified_time(mt);
+			res->set_last_modified_time(mt);
 		}
 #endif
 
 		if (_loaded_callback) {
-			_loaded_callback(load_task.resource, load_task.local_path);
+			_loaded_callback(res, load_task.local_path);
 		}
 	} else if (!ignoring) {
 		Ref<Resource> existing = ResourceCache::get_ref(load_task.local_path);
 		if (existing.is_valid()) {
-			load_task.resource = existing;
+			res = existing;
 			load_task.status = THREAD_LOAD_LOADED;
 			load_task.progress = 1.0;
 
@@ -394,7 +394,7 @@ void ResourceLoader::_thread_load_function(void *p_userdata) {
 			unlock_pending = false;
 
 			if (_loaded_callback) {
-				_loaded_callback(load_task.resource, load_task.local_path);
+				_loaded_callback(res, load_task.local_path);
 			}
 		}
 	}
